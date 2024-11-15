@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fmt"
-	home "k-space-go/handlers"
+	"k-space-go/handlers"
 	utils "k-space-go/utils"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -18,9 +19,12 @@ func main() {
 
 	utils.Db()
 
-	http.HandleFunc("/", home.HelloHandler)
-	http.HandleFunc("/my-first-endpoint", home.MyFirstEndpoint)
+	r := mux.NewRouter()
+
+	r.HandleFunc("/", handlers.HelloHandler).Methods("GET")
+	r.HandleFunc("/tv/{endpoint:.*}", handlers.TmdbAPIHandler).Methods("GET")
 
 	log.Println("Listening on port", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
+	log.Fatal(http.ListenAndServe(":8080", r))
+
 }
