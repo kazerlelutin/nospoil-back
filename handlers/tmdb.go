@@ -3,7 +3,6 @@ package handlers
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
@@ -12,9 +11,10 @@ import (
 )
 
 func TmdbAPIHandler(w http.ResponseWriter, r *http.Request) {
+
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Erreur lors du chargement du fichier .env : %v", err)
+		//log.Fatalf("Erreur lors du chargement du fichier .env : %v", err)
 	}
 
 	apiKey := os.Getenv("TMDB_API_KEY")
