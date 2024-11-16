@@ -5,6 +5,5 @@ import (
 )
 
 func Db() {
-
 	fmt.Println("Connected to CockroachDB successfully!")
 }

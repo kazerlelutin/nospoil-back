@@ -2,7 +2,6 @@ package main
 
 import (
 	"k-space-go/handlers"
-	utils "k-space-go/utils"
 	"log"
 	"net/http"
 	"os"
@@ -16,8 +15,6 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-
-	utils.Db()
 
 	r := mux.NewRouter()
 
