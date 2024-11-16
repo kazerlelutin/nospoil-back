@@ -9,6 +9,24 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Middleware pour les CORS
+func enableCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Set("Access-Control-Allow-Origin", "*") //TODO WHITE LIST
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		//OPTIONS
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	port := os.Getenv("PORT")
 
@@ -18,10 +36,15 @@ func main() {
 
 	r := mux.NewRouter()
 
+	r.Use(enableCORS)
+
 	r.HandleFunc("/", handlers.HelloHandler).Methods("GET")
 	r.HandleFunc("/tv/{endpoint:.*}", handlers.TmdbAPIHandler).Methods("GET")
 
-	log.Println("Listening on port", port)
-	log.Fatal(http.ListenAndServe(":8080", r))
+	// Auth
+	r.HandleFunc("/auth/login", handlers.SignInWithOTP).Methods("POST")
+	r.HandleFunc("/auth/verify", handlers.VerifyOTP).Methods("POST")
 
+	log.Println("Listening on port", port)
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
