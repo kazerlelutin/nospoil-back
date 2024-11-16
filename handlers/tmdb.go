@@ -48,6 +48,7 @@ func TmdbAPIHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Erreur lors de l'appel API : %v", err), http.StatusInternalServerError)
 		return
 	}
+
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
