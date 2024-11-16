@@ -44,7 +44,7 @@ func SignInWithOTP(w http.ResponseWriter, r *http.Request) {
 
 	// Récupère les variables d'environnement nécessaires
 	supabaseURL := os.Getenv("SUPABASE_SERVICE_URL")
-	apiKey := os.Getenv("DB_SERVICE_KEY")
+	apiKey := os.Getenv("SUPABASE_SERVICE_KEY")
 
 	if supabaseURL == "" || apiKey == "" {
 		http.Error(w, "Paramètres d'environnement manquants", http.StatusInternalServerError)
@@ -124,7 +124,7 @@ func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 
 	// Récupère les variables d'environnement nécessaires
 	supabaseURL := os.Getenv("SUPABASE_SERVICE_URL")
-	apiKey := os.Getenv("DB_SERVICE_KEY")
+	apiKey := os.Getenv("SUPABASE_SERVICE_KEY")
 	if supabaseURL == "" || apiKey == "" {
 		http.Error(w, "Paramètres d'environnement manquants", http.StatusInternalServerError)
 		return
