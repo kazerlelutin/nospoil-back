@@ -48,8 +48,9 @@ func SignInWithOTP(w http.ResponseWriter, r *http.Request) {
 
 	url := fmt.Sprintf("%s/auth/v1/otp", supabaseURL)
 
-	payload := map[string]string{
-		"email": email,
+	payload := map[string]interface{}{
+		"email":            email,
+		"shouldCreateUser": true,
 	}
 
 	payloadBytes, err := json.Marshal(payload)
