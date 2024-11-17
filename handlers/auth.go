@@ -128,7 +128,7 @@ func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 	payload := map[string]string{
 		"email": requestBody.Email,
 		"token": requestBody.OTP, // Le code OTP que l'utilisateur a reçu
-		"type":  "magiclink",     // Pour indiquer que c'est un OTP envoyé par e-mail
+		"type":  "email",         // Pour indiquer que c'est un OTP envoyé par e-mail
 	}
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
