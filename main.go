@@ -41,10 +41,6 @@ func main() {
 	r.HandleFunc("/", handlers.HelloHandler).Methods("GET")
 	r.HandleFunc("/tv/{endpoint:.*}", handlers.TmdbAPIHandler).Methods("GET")
 
-	// Auth
-	r.HandleFunc("/auth/login", handlers.SignInWithOTP).Methods("POST")
-	r.HandleFunc("/auth/verify", handlers.VerifyOTP).Methods("POST")
-
 	log.Println("Listening on port", port)
 	log.Fatal(http.ListenAndServe(":"+port, r))
 }
