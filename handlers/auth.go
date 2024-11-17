@@ -4,9 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 
-	"log"
 	"net/http"
 	"os"
 
@@ -14,18 +13,14 @@ import (
 )
 
 func SignInWithOTP(w http.ResponseWriter, r *http.Request) {
-	// Charge les variables d'environnement depuis le fichier .env
-	err := godotenv.Load()
-	if err != nil {
-		//	http.Error(w, fmt.Sprintf("Erreur lors du chargement du fichier .env : %v", err), http.StatusInternalServerError)
-		return
-	}
+
+	godotenv.Load()
 
 	var requestBody struct {
 		Email string `json:"email"`
 	}
 
-	err = json.NewDecoder(r.Body).Decode(&requestBody)
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
 		http.Error(w, "Requête invalide, impossible de décoder le corps", http.StatusBadRequest)
 		return
@@ -43,24 +38,18 @@ func SignInWithOTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Récupère les variables d'environnement nécessaires
 	supabaseURL := os.Getenv("SUPABASE_SERVICE_URL")
 	apiKey := os.Getenv("SUPABASE_SERVICE_KEY")
-
-	log.Println(supabaseURL, apiKey)
 
 	if supabaseURL == "" || apiKey == "" {
 		http.Error(w, "Paramètres d'environnement manquants", http.StatusInternalServerError)
 		return
 	}
 
-	// Endpoint d'authentification par OTP
 	url := fmt.Sprintf("%s/auth/v1/otp", supabaseURL)
 
-	// Corps de la requête pour l'OTP
 	payload := map[string]string{
 		"email": email,
-		//"create_user": "true",
 	}
 
 	payloadBytes, err := json.Marshal(payload)
@@ -69,7 +58,6 @@ func SignInWithOTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Création de la requête HTTP POST
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Erreur lors de la création de la requête : %v", err), http.StatusInternalServerError)
@@ -80,42 +68,34 @@ func SignInWithOTP(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("apikey", apiKey)
 	req.Header.Set("Authorization", "Bearer "+apiKey)
 
-	// Envoi de la requête
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+
 		http.Error(w, fmt.Sprintf("Erreur lors de l'appel à l'API : %v", err), http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()
 
-	// Vérification du code de statut de la réponse
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
 		http.Error(w, fmt.Sprintf("Erreur de l'API : statut %d", resp.StatusCode), http.StatusInternalServerError)
 		return
 	}
 
-	// Réponse de succès
 	fmt.Fprintf(w, "Un code OTP a été envoyé à %s", email)
 }
 
 func VerifyOTP(w http.ResponseWriter, r *http.Request) {
-	// Charge les variables d'environnement depuis le fichier .env
-	err := godotenv.Load()
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Erreur lors du chargement du fichier .env : %v", err), http.StatusInternalServerError)
-		return
-	}
 
-	// Parse les paramètres de la requête
+	godotenv.Load()
+
 	var requestBody struct {
 		Email string `json:"email"`
 		OTP   string `json:"otp"`
 	}
 
-	err = json.NewDecoder(r.Body).Decode(&requestBody)
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
-		log.Println(err)
 		http.Error(w, "Requête invalide, impossible de décoder le corps", http.StatusBadRequest)
 		return
 	}
@@ -125,7 +105,6 @@ func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Récupère les variables d'environnement nécessaires
 	supabaseURL := os.Getenv("SUPABASE_SERVICE_URL")
 	apiKey := os.Getenv("SUPABASE_SERVICE_KEY")
 	if supabaseURL == "" || apiKey == "" {
@@ -169,7 +148,7 @@ func VerifyOTP(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	// Lecture de la réponse
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Erreur lors de la lecture de la réponse : %v", err), http.StatusInternalServerError)
 		return
