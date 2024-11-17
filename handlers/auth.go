@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+
 	"log"
 	"net/http"
 	"os"
@@ -16,7 +17,7 @@ func SignInWithOTP(w http.ResponseWriter, r *http.Request) {
 	// Charge les variables d'environnement depuis le fichier .env
 	err := godotenv.Load()
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Erreur lors du chargement du fichier .env : %v", err), http.StatusInternalServerError)
+		//	http.Error(w, fmt.Sprintf("Erreur lors du chargement du fichier .env : %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -45,6 +46,8 @@ func SignInWithOTP(w http.ResponseWriter, r *http.Request) {
 	// Récupère les variables d'environnement nécessaires
 	supabaseURL := os.Getenv("SUPABASE_SERVICE_URL")
 	apiKey := os.Getenv("SUPABASE_SERVICE_KEY")
+
+	log.Println(supabaseURL, apiKey)
 
 	if supabaseURL == "" || apiKey == "" {
 		http.Error(w, "Paramètres d'environnement manquants", http.StatusInternalServerError)
