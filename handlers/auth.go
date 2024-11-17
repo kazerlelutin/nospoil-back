@@ -75,7 +75,15 @@ func SignInWithOTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Erreur lors de l'appel à l'API : %v", err), http.StatusInternalServerError)
 		return
 	}
+
 	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	fmt.Fprintf(w, "Réponse de l'API : %s", string(body))
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Erreur lors de la lecture de la réponse : %v", err), http.StatusInternalServerError)
+		return
+	}
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
 		http.Error(w, fmt.Sprintf("Erreur de l'API : statut %d", resp.StatusCode), http.StatusInternalServerError)
